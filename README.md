@@ -20,7 +20,7 @@ The APIs, documents, notes, markdown files, text files and all files are copylef
 The T104 product code designation for the THETAKey product denotes the first variant of the THETAKey smart card and subsequent variant will see the numerical changes while retaining the initial 'T' designation for the THETAKey product line. Due to the possibility of expanding the product line beyond an advanced smart card, numerical designations would be used to indicate the different hardware variants that the THETAKey devices that are available.
 
 ## THETAKey T104 Physical Characteristics ##
-* ISO-7816 (Contact) and ISO-14443 (Contactless/NFC) physical and electrical compliant
+* ISO-14443 (Contactless/NFC) physical and electrical compliant
 * CC EAL 6+ smart card chip (THD-89 chip)
 * Single line E-Ink display
 * 2 mechanical power & scroll buttons
@@ -50,6 +50,15 @@ Unlike the T101, the T104 requires restricts all access to its OpenAPI to regist
 The following T104 OpenAPI calls accessing the E-Wallet features are restricted to approved registered applets by the card's Key Manager Admin account to access:
 * setGlobalWalletAmount() - For setting and updating funds stored in the E-Wallet
 * getGlobalWalletAmount() - For retrieving funds stored in the E-Wallet
+
+## THETAKey T104 NFC Access ##
+The NFC access is physically coupled to the power button and the embedded battery. The card's NFC is NOT ACCESSIBLE if the power is not switched on as the NFC and secure element is coupled to and uses the power from the embedded battery instead of the power from the NFC energy emitted from the host machine. The coupling of the NFC and secure element to the internal battery also acts as a hardware switch to prevent NFC proximity hacking as the card must be switched on to gain access to the secure element chip and other card features. 
+
+Managing card applets will also require the power to be switched on and will drain the card's battery gradually. It is recommended that developers plan out their releases ahead of time before programming the card.
+
+The card is essentially unusable if the battery is damaged or insufficient power is available from the battery.
+
+Be sure to bake a backup function on your applets to allow migration of important data between cards.
 
 ## T104 KeyManager and OpenAPI Components Architecture ##
 
