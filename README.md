@@ -28,7 +28,7 @@ The T104 product code designation for the THETAKey product denotes the first var
   
 ## The THD-89 Common Criteria Secure MicroController Certification ##
 * Note that the certification does not apply to the JCOS or other applets and libraries not specified in the Common Criteria document.
-* [https://https://www.commoncriteriaportal.org/files/epfiles/2018-36-INF-3198.pdf](https://https://www.commoncriteriaportal.org/files/epfiles/2018-36-INF-3198.pdf)
+* [https://www.commoncriteriaportal.org/files/epfiles/2018-36-INF-3198.pdf](https://www.commoncriteriaportal.org/files/epfiles/2018-36-INF-3198.pdf)
 
 ## THETAKey T104 Subsystems ##
 
