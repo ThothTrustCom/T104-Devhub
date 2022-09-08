@@ -158,6 +158,28 @@ public class ManagementTokenAPI {
 		return null;
 	}
 
+	private static APDUResult rawGetCardTimeout(Device tag)
+			throws CardException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+			ShortBufferException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException,
+			InvalidSizeException, InvalidParameterSpecException, InvalidKeySpecException {
+		if (tag != null) {
+			return sendMessage((byte) 0x88, (byte) 0xB2, (byte) 0x05, (byte) 0x00, null, 255);
+		}
+		return null;
+	}
+
+	private static APDUResult rawSetCardTimeout(Device tag, short timeout)
+			throws CardException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+			ShortBufferException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException,
+			InvalidSizeException, InvalidParameterSpecException, InvalidKeySpecException {
+		if (tag != null) {
+			byte[] timeoutBytes = new byte[2];
+			BinUtils.shortToBytes(timeout, timeoutBytes, (short) 0);
+			return sendMessage((byte) 0x88, (byte) 0xD2, (byte) 0x02, (byte) 0x00, timeoutBytes, 255);
+		}
+		return null;
+	}
+
 	private static APDUResult rawUpdatePin(Device tag, byte userID, byte[] newPin)
 			throws CardException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
 			ShortBufferException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException,
@@ -516,6 +538,39 @@ public class ManagementTokenAPI {
 			return res.isSuccess();
 		}
 		return false;
+	}
+
+	public static boolean setTimeoutTime(short timeout)
+			throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, ShortBufferException,
+			IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException,
+			InvalidParameterSpecException, InvalidKeySpecException, CardException, InvalidSizeException {
+		init();
+		APDUResult res = rawSetCardTimeout(managementTokenDev, timeout);
+		if (res != null) {
+			return res.isSuccess();
+		}
+		return false;
+	}
+	
+	public static short getTimeoutTime()
+			throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, ShortBufferException,
+			IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException,
+			InvalidParameterSpecException, InvalidKeySpecException, CardException, InvalidSizeException {
+		init();
+		System.out.println("Getting Raw Timeout ...");
+		APDUResult res = rawGetCardTimeout(managementTokenDev);
+		if (res != null) {
+			if (res.isSuccess()) {
+				byte[] result = res.getResult();
+				System.out.println("Timeout Raw :: " + BinUtils.toHexString(result));
+				if (result != null) {
+					if (result.length == 2) {
+						return BinUtils.bytesToShort(result[0], result[1]);
+					}
+				}
+			}
+		}
+		return -1;
 	}
 
 	public static boolean editAOCCOntainerSetting(byte[] settingsData)

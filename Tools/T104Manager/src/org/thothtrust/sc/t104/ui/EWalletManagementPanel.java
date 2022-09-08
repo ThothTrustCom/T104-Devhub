@@ -124,13 +124,6 @@ public class EWalletManagementPanel extends JPanel {
 		add(tablePane, BorderLayout.CENTER);
 		add(ctrlPane, BorderLayout.SOUTH);
 
-//		appletTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-//			@Override
-//			public void valueChanged(ListSelectionEvent e) {
-//				
-//			}
-//		});
-
 		appletTable.addMouseListener(new MouseListener() {
 
 			@Override

@@ -26,6 +26,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
 import javax.smartcardio.CardException;
 import javax.smartcardio.CommandAPDU;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -34,6 +35,8 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.thothtrust.sc.t104.Constants;
 import org.thothtrust.sc.t104.api.ManagementTokenAPI;
@@ -51,26 +54,14 @@ public class MainFrame extends JFrame {
 	private JLabel loginLbl = null;
 	private JPasswordField pwdTf = null;
 	private JButton loginBtn = null;
-
 	private JPanel mainPane = null;
 	private JTabbedPane mainTabPane = null;
-
-	private JPanel balPane = null;
-	private JPanel payPane = null;
-	private JPanel loadPane = null;
-	private JPanel otpPane = null;
-	private JLabel balLbl = null;
-	private JLabel payLbl = null;
-	private JLabel loadLbl = null;
-	private JTextField balTf = null;
-	private JTextField payTf = null;
-	private JTextField loadTf = null;
-	private JButton balBtn = null;
-	private JButton payBtn = null;
-	private JButton loadBtn = null;
-	private JButton genOtpBtn = null;
 	private GridBagConstraints c = null;
 	private Device dev = null;
+	private PinChangePanel tp1 = null;
+	private EWalletManagementPanel tp2  = null;
+	private CardSettingsPanel tp3  = null;		
+	public static ImageIcon logoIcon = null;
 
 	public MainFrame(Device dev) {
 		setDevice(dev);
@@ -84,11 +75,16 @@ public class MainFrame extends JFrame {
 		this.setLocationRelativeTo(null);
 		this.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-
+		logoIcon = new ImageIcon(BinUtils.hexStringToByteArray(Constants.LOGO_BYTES_HEXSTR));
+		this.setIconImage(logoIcon.getImage());
+		tp1 = new PinChangePanel();
+		tp2 = new EWalletManagementPanel();
+		tp3 = new CardSettingsPanel();
 		mainPane = new JPanel(new BorderLayout());
 		mainTabPane = new JTabbedPane();
-		mainTabPane.addTab("Change Admin PIN", null, new PinChangePanel(), "Change administrative pin");
-		mainTabPane.addTab("Manage E-Wallet", null, new EWalletManagementPanel(), "Manage access rights of E-Wallet");
+		mainTabPane.addTab("Change Admin PIN", null, tp1, "Change administrative pin");
+		mainTabPane.addTab("Manage E-Wallet", null, tp2, "Manage access rights of E-Wallet");
+		mainTabPane.addTab("Manage Card", null, tp3, "Manage generic card settings");
 		mainPane.add(mainTabPane, BorderLayout.CENTER);
 
 		loginPane = new JPanel(new GridBagLayout());
@@ -141,6 +137,13 @@ public class MainFrame extends JFrame {
 		this.addWindowListener(new WindowAdapter() {
 			public void windowOpened(WindowEvent e) {
 				pwdTf.requestFocus();
+			}
+		});
+		
+		mainTabPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				tp3.updateCardSettingsStatus();
 			}
 		});
 
@@ -219,20 +222,5 @@ public class MainFrame extends JFrame {
 		} else {
 			throw new CardException("Device not found");
 		}
-	}
-
-	public static void main(String[] args) {
-//		try {
-//			DeviceManager devMan = DeviceManager.getInstance(false);
-//			if (devMan.getDevicesCount() > 0) {
-//				MainFrame m = new MainFrame(devMan.getDevice(0));
-//			} else {
-//				JOptionPane.showMessageDialog(null, "Unable to find suitable T104 demo device.",
-//						"No Suitable Device Found", JOptionPane.ERROR_MESSAGE);
-//			}
-//		} catch (CardException e) {
-//			e.printStackTrace();
-//		}
-		MainFrame m = new MainFrame(null);
 	}
 }
