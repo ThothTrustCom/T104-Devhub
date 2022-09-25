@@ -9,6 +9,8 @@ Two mechanical buttons, one operating the power On/Off and the other allowing th
 The T104 product aims to provide a more affordable variant to the T101 while giving up on some aspects of enhanced security that T101 provides to end users.
 
 The THETAKey family with their Open APIs, allows end users to simply utilize existing JavaCard programming language to create their own JavaCard applets or to re-use existing off-the-shelf JavaCard applets with minimal changes to existing JavaCard applet codebases while being able fully utilize the security framework and capabilities provided by the THETAKey family of OpenAPIs.
+ 
+![T104 in a white labelled variant](img/T104-CodeWav.jpg)
 
 ### Licenses and Intellectual Properties Notices ###
 This code repository abides by BSD-3 Clause license found in [LICENSE](LICENSE) file.
@@ -45,13 +47,16 @@ An E-Wallet system has also been baked into the Key Manager to provide a single 
 
 A client card application is required to register it's presence and setup an Application Container within the THETAKey Key Manager environment so as to allow secure resource access while providing gaurantees that the access calls are authenticated from the registered client application's end to prevent malicious spoofing of API access calls.
 
-Unlike the T101, the T104 requires restricts all access to its OpenAPI to registered applets. There are two layers of security for the T104 due to the presence of a centrally managed E-Wallet System within the T104 card. Registration of applet to the Key Manager does not provide access to the E-Wallet System. A unique Admin account embedded within the T104 Key Manager with a default PIN code provides access to the E-Wallet management region of the E-Wallet System to give give access or revoke access to registered applets to the E-Wallet System.
+Unlike the T101, the T104 restricts all access to its OpenAPI to registered applets. There are two layers of security for the T104 due to the presence of a centrally managed E-Wallet System within the T104 card. Registration of applet to the Key Manager does not provide access to the E-Wallet System. A unique Admin account embedded within the T104 Key Manager with a default PIN code provides access to the E-Wallet management region of the E-Wallet System to give give access or revoke access to registered applets to the E-Wallet System.
 
 The following T104 OpenAPI calls accessing the E-Wallet features are restricted to approved registered applets by the card's Key Manager Admin account to access:
 * setGlobalWalletAmount() - For setting and updating funds stored in the E-Wallet
 * getGlobalWalletAmount() - For retrieving funds stored in the E-Wallet
 
+![Components Architecture](img/architecture-1.jpg)
+
 ## THETAKey T104 NFC Access ##
+### General Access ###
 The NFC access is physically coupled to the power button and the embedded battery. The card's NFC is NOT ACCESSIBLE if the power is not switched on as the NFC and secure element is coupled to and uses the power from the embedded battery instead of the power from the NFC energy emitted from the host machine. The coupling of the NFC and secure element to the internal battery also acts as a hardware switch to prevent NFC proximity hacking as the card must be switched on to gain access to the secure element chip and other card features. 
 
 Managing card applets will also require the power to be switched on and will drain the card's battery gradually. It is recommended that developers plan out their releases ahead of time before programming the card.
@@ -59,6 +64,24 @@ Managing card applets will also require the power to be switched on and will dra
 The card is essentially unusable if the battery is damaged or insufficient power is available from the battery.
 
 Be sure to bake a backup function on your applets to allow migration of important data between cards.
+
+![T104 Physical Components](img/components-breakdown.jpg)
+
+### THETAKey T104 NFC Timeout ###
+The ThetaKey T104 configuration is set to have a default timeout of 5 minutes (300 seconds) upon detection of idle activity which will automatically power off the card once the card times out. The card's timeout function can be switched on and off and the duration for timeout can be controlled either via the OpenAPI or via access to the T104 Manager.
+
+Any registered applet may fetch the duration of the card's timeout and whether the card's timeout timer is in the on or off state.
+
+From the T104 OpenAPI, the following methods provides timeout access capabilities:
+* setCardTimeout() - For setting the timeout duration as well as toggling on or off the timeout function.
+* getCardTimeout() - For retrieving the timeout duration as well as the status of the timeout timer setting.
+
+### A Word Of Caution ###
+When deciding to edit the card's timeout settings either from the Open API or via the T104 Manager, it is strongly advisable not to switch off the timeout timer as this will leave your card permanently switched on until you use the physical power button to turn the card on or off to physically switch off the card. The card would be rendered useless once the card's non-rechargeable battery is fully drained.
+
+The card's timeout timer is shared globally and developers have to anticipate that there maybe other applets on the card and adjusting the timeout settings from your card applet may affect other applets too. Care must be taken when handling the timeout timer.
+
+Card Admins with administrative access to the T104 Manager may overwrite the global timeout settings and care must be taken when editting the timeout settings of the card.
 
 ## T104 KeyManager and OpenAPI Components Architecture ##
 
@@ -72,7 +95,7 @@ During the initial applet registration to the Key Manager via the createAOCConta
 
 An E-Wallet container also exists in the Key Manager applet for the E-Wallet system. A single slot for 'balance' unit of funds, a single slot for 'pay' unit of funds and a single slot for 'load' unit of funds are shared by all registered and authorized applets for the E-Wallet System. All registered and authorized applets tap these slots freely and care must be taken when manipulating these funds as incorrect manipulation of funds may affect other applets using the E-Wallet System. The E-Wallet System does not contain any logic for incrementing, decrementing, partial or full refunding of funds. It is simply a storage data slot and it requires the applets to do the manual manipulation and then updating of the funds.
 
-## T104 E-Wallet Management Access ##
+## T104 E-Wallet Access Management ##
 
 A T104Manager tool is found under the Tools folder that contains the source code and executable JAR file binary for the management tool to manage the E-Wallet System as the KeyManager Administrator role.
 
@@ -101,6 +124,14 @@ Some examples of unacceptable inputs:
 * 123.45678
 * 1234567890
 
+## Page Links ##
+* [Product Overview](README.md)
+* [Basic User Manual](Basic%20User%20Manual.md)
+* [Developer Guide](Developer%20Guide.md)
+* [Developer Samples Guide](Developer%20Samples%20Guide.md)
+* [JavaDoc API](JavaDoc%20API.md)
+* [T104 Applet APDU Guide](T104%20Applet%20APDU%20Guide.md)
+
 ## THETAKey Product Page ##
 * [https://thothtrust.com/products.html#thetakey](https://thothtrust.com/products.html#thetakey)
-* Email for a sample [mailto:sales@thothtrust.com](here).
+* Email to purchase a sample [here](mailto:sales@thothtrust.com).
