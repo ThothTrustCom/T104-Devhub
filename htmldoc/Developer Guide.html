@@ -1,0 +1,245 @@
+<html><head><meta name="color-scheme" content="light dark"></head><body><link rel="stylesheet" type="text/css" href="chrome-extension://ckkdlimhmcjmikdlpkmbgfkaikojcbjk/themes/github.css" id="_theme"><div id="_html" class="markdown-body"><h1 id="developer-guide"><a class="anchor" name="developer-guide" href="#developer-guide"><span class="octicon octicon-link"></span></a>Developer Guide</h1>
+<h2 id="developing-and-testing-on-card"><a class="anchor" name="developing-and-testing-on-card" href="#developing-and-testing-on-card"><span class="octicon octicon-link"></span></a>Developing and Testing on Card</h2>
+<p>Development of applets maybe carried out on the T104 card but care must be taken as the card needs to be powered on to allow access to the NFC for managing the applets on the cards as well as interacting with the applets on the card.</p>
+<p>The default timeout set on the card is 5 minutes before a forced timeout and shutdown of the card is executed.</p>
+<p>Developers may choose to increase the timeout time using the T104 Manager or to simply disable the timeout on the card.</p>
+<p>Disabling the timeout on the card has the risk of draining the battery power on the card and forgetting to switch off the card when not in use.</p>
+<h2 id="displaying-arbitrary-integers-and-decimals"><a class="anchor" name="displaying-arbitrary-integers-and-decimals" href="#displaying-arbitrary-integers-and-decimals"><span class="octicon octicon-link"></span></a>Displaying Arbitrary Integers and Decimals</h2>
+<p>The T104 open API allows writing arbitrary positive integer and postive two-decimal placed decimals to the display of the T104 card.</p>
+<p>Arbitrary positive integer and positive two-decimal placed decimal display is done via the following API call:</p>
+<blockquote>
+<p><code>public void displayToScreen(byte[] input, short off, short len, byte[] ticket, short ticketOff);</code></p>
+</blockquote>
+<p>The following requirements must be met for rendering:</p>
+<ul>
+<li>Either a 8 digit positive integer or a two-decimal placed positive decimal with the the numbers before the decimal place up to 6 digit place.</li>
+<li>The maximum positive two-decimal placed decimal value shall be <code>999999.99</code> and the smallest value shall be <code>0.00</code>.</li>
+<li>Encoding of the input shall be in hexadecimal value.</li>
+<li>Example of value <code>999999.99</code> shall be encoded in hexadecimal as input as <code>3939393939392E3939</code>.</li>
+</ul>
+<h2 id="e-wallet-development"><a class="anchor" name="e-wallet-development" href="#e-wallet-development"><span class="octicon octicon-link"></span></a>E-Wallet Development</h2>
+<p>The E-Wallet feature is a separate feature from the arbitrary display of numbers operating in a partially related manner.</p>
+<p>The E-Wallet module has three global value storage slots to store values for 'Balance', 'Payment' and 'Loaded Funds' related amount. These amount will need to be accessed and displayed on demand whenever the user powers on the cards.</p>
+<p>Applets have to follow these steps to utilize the global stored value: </p>
+<ol>
+<li>Manually retrieve the value(s) of the targeted slot(s)</li>
+<li>Convert them to a format that their applets could process (i.e. to short, int or BigNumber types)</li>
+<li>Perform the required logical operations in their own applets</li>
+<li>Convert the results of the logical operations for each of the global value(s) they wish to update</li>
+<li>Write the updated value(s) to the slot(s)</li>
+</ol>
+<p>Applets shall use the following method to retrieve the value(s) from the slot(s) one at a time:</p>
+<blockquote>
+<p><code>public short getGlobalWalletAmount(byte type, byte[] output, short off, byte[] ticket, short ticketOff);</code></p>
+</blockquote>
+<p>The returned result would be in hexadecimal representation of the value:</p>
+<blockquote>
+<p><code>3939393939392E3939</code> for '999999.99' as an example.</p>
+</blockquote>
+<p>Applets shall use the following method to write one or more value(s) from the slot(s) and specify a default slot to display upon successfully performing the value write operation to all the slot(s):</p>
+<blockquote>
+<p><code>public short setGlobalWalletAmount(byte displayWalletRecordSlot, byte[] balance, short balanceOff, short balanceLen, byte[] payment, short paymentOff, short paymentLen, byte[] loading, short loadingOff, short loadingLen, byte[] ticket, short ticketOff);</code></p>
+</blockquote>
+<p>The format and rules for the writing of values is the same as displaying arbitrary numbers and decimals.</p>
+<p>The <code>displayWalletRecordSlot</code> variable shall use the following:</p>
+<ul>
+<li><code>T104OpenAPI.WALLET_BALANCE_RECORD_SLOT</code> - Displays Balance slot upon successful write operation.</li>
+<li><code>T104OpenAPI.WALLET_PAYMENT_RECORD_SLOT</code> - Displays Payment slot upon successful write operation.</li>
+<li><code>T104OpenAPI.WALLET_LOADING_RECORD_SLOT</code> - Displays Loaded Funds slot upon successful write operation.</li>
+</ul>
+<p>Upon successful updating of the slots, the values are stored persistently and powering up the card will allow on-demand access to these values displayed on screen via toggling the E-Wallet scrolling mechanical button.</p>
+<h2 id="calling-the-open-api"><a class="anchor" name="calling-the-open-api" href="#calling-the-open-api"><span class="octicon octicon-link"></span></a>Calling the Open API</h2>
+<p>To call any of the Open API methods, these following pre-requisite steps must be fulfilled.</p>
+<ol>
+<li>Applet must get a Shareable Instance of the T104OpenAPI</li>
+<li>Call once the <code>createAOCContainer()</code> to create a Applet Object Container (AOC) instance with a supplied PIN / secret key that will be used for HMAC-SHA256 challenge-response protocol</li>
+<li>Perform <code>appLogin()</code> once to establish a session via a HMAC-SHA256 digital signing of a challenge generated by the T104 Applet.</li>
+<li>Store the T104 Applet issued session challenge as a session ticket.</li>
+<li>Call the API with the session ticket to authenticate the API call.</li>
+</ol>
+<h2 id="registering-the-aoc-container"><a class="anchor" name="registering-the-aoc-container" href="#registering-the-aoc-container"><span class="octicon octicon-link"></span></a>Registering the AOC Container</h2>
+<p>A Shareable Interface of T104OpenAPI must first be requested. Any applet may request this interface. A PIN, password or secret key up to length of 64 bytes maybe used as the authenticator.</p>
+<pre><code>// AID of T104 Applet
+byte[] serverAID = new byte[] { (byte) 0x4B, (byte) 0x4D, (byte) 0x31, (byte) 0x30, (byte) 0x34, (byte) 0x00 };
+
+// PIN for API
+byte[] aocPIN = new byte[] { (byte) 0x31, (byte) 0x31, (byte) 0x31, (byte) 0x31, (byte) 0x31, (byte) 0x31, (byte) 0x31, (byte) 0x31};
+
+// Max pin retry before locking occurs
+short maxRetry = (short) 5;
+
+// Lookup T104 Applet AID
+AID apiAID = JCSystem.lookupAID(serverAID, (short) 0, (byte) serverAID.length);
+
+// Get the Shareable Interface
+KM104.T104OpenAPI api = (KM104.T104OpenAPI) JCSystem.getAppletShareableInterfaceObject(apiAID, (byte) 0);
+
+// Check if Shareable Interface has been fetched
+if (api == null) {
+    // TODO: Do something if fail
+} else {
+    // Copy to APDU Buffer or some global byte array buffer
+    Util.arrayCopyNonAtomic(aocPIN, (short) 0, apduBuf, (short) 0, (short) aocPIN.length);
+
+    // Register for AOC Container        
+    if (!api.createAOCContainer(T104OpenAPI.CRED_AUTHTYPE_PIN, apduBuf, (short) 0, aocPIN.length, maxRetry)) {
+        // TODO: Do something if fail
+    }
+}</code></pre>
+<p>Storage of AOC authenticator maybe in a <code>Key</code> object or simply as a byte array.</p>
+<p>It is advisable to make the authenticator as unpredictable as possible unless you want to recover access to the AOC container between periods of uninstalling and installing an applet for a possible applet upgrade.</p>
+<h2 id="destroying-the-aoc-container"><a class="anchor" name="destroying-the-aoc-container" href="#destroying-the-aoc-container"><span class="octicon octicon-link"></span></a>Destroying the AOC Container</h2>
+<p>It is advisable to call for destruction of AOC container under these two circumstances:</p>
+<ol>
+<li><p>During creation of new AOC container, there might be an existing entry that is unusable as the PIN/Password/Secret Key authenticator is lost or not known, it is advisable to call for destruction of any known AOC container registered to the same AID + RID.</p>
+</li>
+<li><p>It is advisable to extend the <code>Applet</code> class with <code>AppletEvent</code> and implement the <code>uninstall()</code> method which triggers the destruction of the AOC container.</p>
+</li>
+</ol>
+<p>API Call:</p>
+<ul>
+<li><code>public boolean destroyAOCContainer();</code></li>
+</ul>
+<h2 id="managing-the-aoc-container"><a class="anchor" name="managing-the-aoc-container" href="#managing-the-aoc-container"><span class="octicon octicon-link"></span></a>Managing the AOC Container</h2>
+<p>Management of AOC container only allows the changing of PIN/Password/Secret Key used to authenticate the applet to the API.</p>
+<p>Maximum authenticator length is 64 bytes.</p>
+<p>This function can only be called after successful login of applet to T104 API session as you will need a valid session ticket to proceed further.</p>
+<p>API Call:</p>
+<ul>
+<li><code>public boolean manageAOCContainer(byte fieldType, byte[] input, short offset, short len, short maxRetry, byte[] ticket, short ticketOff);</code></li>
+</ul>
+<p>The <code>fieldType</code> variable shall use the following:</p>
+<ul>
+<li><code>T104OpenAPI.CRED_FIELD_SECRET</code> - Perform management to authenticator secret.</li>
+</ul>
+<h2 id="api-session-authentication-and-security"><a class="anchor" name="api-session-authentication-and-security" href="#api-session-authentication-and-security"><span class="octicon octicon-link"></span></a>API Session Authentication and Security</h2>
+<h3 id="t104-environment-security-level"><a class="anchor" name="t104-environment-security-level" href="#t104-environment-security-level"><span class="octicon octicon-link"></span></a>T104 Environment Security Level</h3>
+<p>There are two levels of security for the API access. The basic level of security allows any registered applet to access including arbitrary display or integers and decimals. The advanced level of security reserves the access of the E-Wallet function to selected applets. The T104 Manager access is required to assign or unassign an already registered applet with the access to the advanced security level giving the E-Wallet function access rights to the registered applet.</p>
+<p>Security Levels:</p>
+<ul>
+<li>Level 1 - All API calls except E-Wallet calls</li>
+<li>Level 2 - All API calls including E-Wallet calls</li>
+</ul>
+<p>This arrangement prevents all applets from having access to the E-Wallet module for security reasons. The T104 may have applets operating at different security levels securely without additional T104 cards issued for different purposes (i.e. a eID card seperate from a payment card). </p>
+<p>Issuers may also open access to the T104 card more freely to other developers.</p>
+<h3 id="applet-session-authentication"><a class="anchor" name="applet-session-authentication" href="#applet-session-authentication"><span class="octicon octicon-link"></span></a>Applet Session Authentication</h3>
+<p>Applets are required to submit a secret in the form of a PIN or Password. PIN type secrets upon declaration would need to be numerical PIN numbers while Password type secrets accepts any 8-bit byte octets as an input. If a randomly generated secret is used, Pasword should be chosen.</p>
+<p>Both types of secrets have a maximum length of 64 byte.</p>
+<p>Upon successful registration of applet to the T104 environment, a HMAC-SHA256 based challenge response would be required to authenticate the applet for other API calls.</p>
+<p>Authentication steps:</p>
+<ol>
+<li><p>Call <code>appLogin(byte[] param, short paramOffset, short paramLen)</code> for the first time with the parameter using the APDU buffer or some global byte array. It should return a challenge that is <code>T104OpenAPI.AUTH_TICKET_LEN</code> long (10 bytes of challenge for now).</p>
+</li>
+<li><p>Use the PIN/Password as the secret key and challenge as the message in a HMAC-SHA256 signature.</p>
+<p> <code>Signature = HMAC-SHA256(Key=PIN/Password, Message=Challenge);</code></p>
+</li>
+<li><p>Load only the signature from the HMAC-SHA256 into the parameter for <code>appLogin</code> and call the <code>appLogin</code> again. Below are the return status.</p>
+<pre><code>1: Success
+2: Fail
+3: Error occurred</code></pre>
+</li>
+<li><p>If successful, cache the original challenge as the session ticket and use it whenever a <code>ticket</code> parameter is required.</p>
+</li>
+<li><p>An example of using a session ticket after successful login:</p>
+<pre><code>// Display some numbers to screen
+private boolean displayToScreen(byte[] input, short off, short len, byte[] apduBuf, short apduBufOff, byte[] buff, short buffOff, short sbuff) {
+    // Call appLogin to attempt applet login over shareable interface if not yet logged in
+    if (myAppLogin(apduBuf, apduBufOff, buff, buffOff, sbuff) == 1) {
+        // Copy input into APDU buffer
+        Util.arrayCopyNonAtomic(input, off, apduBuf, apduBufOff, len);
+
+        // Copy session ticket into APDU buffer
+        Util.arrayCopyNonAtomic(ticket, (short) 0, apduBuf, (short) (apduBufOff + len),
+                T104OpenAPI.AUTH_TICKET_LEN);
+
+        // Call API with input and session ticket
+        api.displayToScreen(apduBuf, apduBufOff, len, apduBuf, (short) (apduBufOff + len));
+
+        return true;
+    }
+    return false;
+}</code></pre>
+</li>
+</ol>
+<h2 id="t104-manager"><a class="anchor" name="t104-manager" href="#t104-manager"><span class="octicon octicon-link"></span></a>T104 Manager</h2>
+<p>The T104 Manager GUI console provides a convenient way to manage the T104 Environment. It should be noted that the T104 Manager does not manage the GlobalPlatform environment.</p>
+<p>The roles of T104 Manager:</p>
+<ul>
+<li>Manage access to E-Wallet feature</li>
+<li>Manage T104 card timeout timer</li>
+</ul>
+<p>To administer a T104 card from T104 Manager:</p>
+<ol>
+<li>Switch on the card</li>
+<li>Login to the T104 Manager by running the Java command: <code>java -jar T104Manager.jar</code></li>
+</ol>
+<p>Login to the T104 Environment:</p>
+<ol>
+<li><p>The T104 Manager and T104 card would attempt to establish a Secure Channel which a 6-digit One-Time PIN (OTP) code would be securely calculated from the session shared secret. Verify visually the OTP code displayed on the T104 Manager pop-up and the T104 card screen to ensure both OTP code matches.</p>
+<p> Card OTP displayed: <br> <img src="img/T104-CodeWav-Screen-Display.jpg" alt="Card OTP Display"></p>
+<p> T104 Manager displays an OTP code: <br> <img src="img/T104Manager-OTP.jpg" alt="T104 Manager GUI displays an OTP code"></p>
+</li>
+<li><p>The default Admin PIN is <code>12345678</code> and a total of 5 PIN retry before the Admin is completely locked out occurs. If the Admin is locked out, the environment is irreversible and unmanageable. There is no way to undo a locked Admin.</p>
+<p> Login to the T104 Manager: <br> <img src="img/T104Manager-Login.jpg" alt="Login to T104 Manager GUI"></p>
+</li>
+</ol>
+<p>To change the Admin PIN:</p>
+<ol>
+<li><p>Navigate to the <code>Change Admin PIN</code> tab, enter and re-enter a new PIN/Password. It can accept any alphanumerical ASCII characters and printable symbols.</p>
+<p> <img src="img/T104Manager-Change-PIN.jpg" alt="Change PIN"></p>
+</li>
+</ol>
+<p>To give E-Wallet Access:</p>
+<ol>
+<li><p>Navigate to the <code>Manage E-Wallet</code> tab and select a single applet AID in the E-Wallet Access Control table without a tick in the <code>Has E-Wallet Access</code> column and click on the <code>Enable E-Wallet Access</code> button. The table should refresh and a tick should be placed next to the selected applet.</p>
+<p> <img src="img/T104Manager-EWallet-Access.jpg" alt="Change E-Wallet Accesing Applet Permission Tab"></p>
+</li>
+</ol>
+<p>To revoke E-Wallet Access:</p>
+<ol>
+<li>Navigate to the <code>Manage E-Wallet</code> tab and select a single applet AID in the E-Wallet Access Control table with a tick in the <code>Has E-Wallet Access</code> column and click on the <code>Disable E-Wallet Access</code> button. The table should refresh and a tick should be empty next to the selected applet.</li>
+</ol>
+<p>Cleaning up potentially orphaned E-Wallet Access Control List indexes:</p>
+<ol>
+<li>Navigate to the <code>Manage E-Wallet</code> tab and click on the <code>Cleanup AOC Containers</code> button.</li>
+</ol>
+<p>Note: The E-wallet ACL may require some cleaning up if a non-existing applet AID appears which is typically due to a previously deleted applet that did not call the <code>destroyAOCContainer()</code> or failed during the <code>destroyAOCContainer()</code> call before deleting the applet. It typically creates an orphan and is typically re-organized, cleaned and removed during invoking of the <code>createAOCContainer()</code> method but if the <code>createAOCContainer()</code> was never called by any applet for a period of time, orphaned entries may build up. If an AID clashes via a newly installed and registered applet has the same AID as the orphaned entries, it will typically lead to a failure to invoke the <code>createAOCContainer()</code> method due to an existing orphaned entry and the T104 Card Admin is required to login to perform such cleanup actions.</p>
+<p>Enabling Card timeout timer:</p>
+<ol>
+<li>Navigate to the <code>Manage Card</code> tab and click on the <code>Disable Timeout</code> button, enter a valid timeout timing in the <code>Timeout Sec</code> field (between 10 to 65534 seconds) and pres the <code>Update</code> button to apply the setting.</li>
+</ol>
+<p>Note: </p>
+<ul>
+<li><p>The <code>Enable Timeout</code> in green font button should be displayed in order to Enable the timeout timer on the card. </p>
+</li>
+<li><p>Do not change tabs when editing the timeout timer as it will refresh itself during tab changes.</p>
+</li>
+</ul>
+<p>Disabling Card timeout timer:</p>
+<ol>
+<li>Navigate to the <code>Manage Card</code> tab and click on the <code>Disable Timeout</code> button to apply the setting.</li>
+</ol>
+<p>Note: </p>
+<ul>
+<li><p>The <code>Disable Timeout</code> in red font button should be displayed in order to Enable the timeout timer on the card.</p>
+</li>
+<li><p>Do not change tabs when editing the timeout timer as it will refresh itself during tab changes.</p>
+<p>  <img src="img/T104Manager-Card-Timeout-Management.jpg" alt="Management of T104 Card Timeout through T104 Manager GUI"></p>
+</li>
+</ul>
+<h2 id="precautions-when-administering-t104-card"><a class="anchor" name="precautions-when-administering-t104-card" href="#precautions-when-administering-t104-card"><span class="octicon octicon-link"></span></a>Precautions When Administering T104 Card</h2>
+<ul>
+<li>Power off card when not in use to save the battery power.</li>
+<li>Change the T104 Card Admin PIN during deployment in production environment and ensure recording and securely storing of the Card Admin PIN to prevent abuse or forgetting the PIN.</li>
+<li>Granting and revoking access to the E-Wallet function has to be done on a basis of trust as the E-Wallet funds are global values accessible by other applets with E-Wallet access rights.</li>
+</ul>
+<h2 id="page-links"><a class="anchor" name="page-links" href="#page-links"><span class="octicon octicon-link"></span></a>Page Links</h2>
+<ul>
+<li><a href="README.md">Product Overview</a></li>
+<li><a href="Basic%20User%20Manual.md">Basic User Manual</a></li>
+<li><a href="Developer%20Guide.md">Developer Guide</a></li>
+<li><a href="Developer%20Samples%20Guide.md">Developer Samples Guide</a></li>
+<li><a href="javadoc/index.html">JavaDoc API</a></li>
+<li><a href="T104%20Applet%20APDU%20Guide.md">T104 Applet APDU Guide</a></li>
+</ul>
+</div></body></html>
