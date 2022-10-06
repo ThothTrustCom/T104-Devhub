@@ -146,7 +146,7 @@ A list of supported TLV tags:
     public static final byte TLV_TAG_AOC_AUXDATA = (byte) 0x0B;
     public static final byte TLV_OBJ_FIELD_ID = (byte) 0x08;
     public static final byte TLV_OBJ_FIELD_HANDLE = (byte) 0x0E;
-\
+<br>
 HW Info Format (sequence):
 
 <table border="1">
