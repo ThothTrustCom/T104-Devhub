@@ -254,9 +254,9 @@ Note:
 * Granting and revoking access to the E-Wallet function has to be done on a basis of trust as the E-Wallet funds are global values accessible by other applets with E-Wallet access rights.
 
 ## Page Links ##
-* [Product Overview](README.md)
-* [Basic User Manual](Basic%20User%20Manual)
-* [Developer Guide](Developer%20Guide)
-* [Developer Samples Guide](Developer%20Samples%20Guide)
+* Product Overview [MD](README.md) [WIKI](README.md)
+* Basic User Manual [MD](Basic%20User%20Manual.md) [WIKI](Basic%20User%20Manual)
+* Developer Guide [MD](Developer%20Guide.md) [WIKI](Developer%20Guide)
+* Developer Samples Guide [MD](Developer%20Samples%20Guide.md) [WIKI](Developer%20Samples%20Guide)
 * [JavaDoc API](javadoc/index.html)
-* [T104 Applet APDU Guide](T104%20Applet%20APDU%20Guide)
+* T104 Applet APDU Guide [MD](T104%20Applet%20APDU%20Guide.md) [WIKI](T104%20Applet%20APDU%20Guide)
