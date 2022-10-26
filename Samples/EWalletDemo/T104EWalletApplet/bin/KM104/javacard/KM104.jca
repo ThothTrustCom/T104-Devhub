@@ -1,0 +1,184 @@
+// converted by version 1.3
+// on Sun Oct 23 18:27:17 SGT 2022
+
+.package KM104 {
+	.aid 0x4B:0x4D:0x31:0x30:0x34;
+	.version 1.0;
+
+	.imports {
+		0xA0:0x0:0x0:0x0:0x62:0x0:0x1 1.0;		//java/lang
+		0xA0:0x0:0x0:0x0:0x62:0x1:0x1 1.5;		//javacard/framework
+	}
+
+	.interface public abstract T104OpenAPI 0 {
+
+		.shareable;
+
+		.superInterfaces {
+			1.2;		// javacard/framework/Shareable
+		}
+
+		.fields {
+			public static final short MAX_OBJ_PER_CRED = 100;		// S
+			public static final short MAX_AOC = 10;		// S
+			public static final short MAX_LIST_OBJ_CNT = 10;		// S
+			public static final short MAX_KMAC_LEN = 128;		// S
+			public static final short MAX_GEN_MAT_LEN = 128;		// S
+			public static final short MAX_PIN_LEN = 64;		// S
+			public static final short MAX_WALLET_DATA_LEN = 9;		// S
+			public static final short MAX_DISPLAY_DATA_LEN = 7;		// S
+			public static final short AUTH_TICKET_LEN = 10;		// S
+			public static final byte OBJ_TYPE_GENERIC = 1;		// B
+			public static final byte OBJ_TYPE_CRED = 2;		// B
+			public static final byte OBJ_TYPE_KEY = 3;		// B
+			public static final byte OBJ_FIELD_VER = 1;		// B
+			public static final byte OBJ_FIELD_TYPE = 2;		// B
+			public static final byte OBJ_FIELD_SUBTYPE_CLASS = 3;		// B
+			public static final byte OBJ_FIELD_SUBTYPE_TYPE = 4;		// B
+			public static final byte OBJ_FIELD_SN = 5;		// B
+			public static final byte OBJ_FIELD_CREATE = 6;		// B
+			public static final byte OBJ_FIELD_EXPIRE = 7;		// B
+			public static final byte OBJ_FIELD_ID = 8;		// B
+			public static final byte OBJ_FIELD_EXPORT = 9;		// B
+			public static final byte OBJ_FIELD_ACL = 10;		// B
+			public static final byte OBJ_FIELD_MATERIAL_SECRET = 11;		// B
+			public static final byte OBJ_FIELD_MATERIAL_PUBLIC = 12;		// B
+			public static final byte OBJ_FIELD_ATTEST = 13;		// B
+			public static final byte OBJ_FIELD_HANDLE = 14;		// B
+			public static final byte OBJ_EXPIRED = 1;		// B
+			public static final byte OBJ_NOT_EXPIRED = 2;		// B
+			public static final byte OBJ_EXPIRY_UNDETERMINED = 3;		// B
+			public static final byte OBJ_PERM_EXPORT_ALLOW_FLAG = -32;		// B
+			public static final byte OBJ_PERM_EXPORT_DENY_FLAG = -17;		// B
+			public static final byte LOOKUP_AVAILABLE_AOC = 1;		// B
+			public static final byte LOOKUP_HAS_FREE_AOC = 2;		// B
+			public static final byte LOOKUP_AVAILABLE_CRED_BY_NAME = 3;		// B
+			public static final byte LOOKUP_AVAILABLE_CRED_BY_ID = 4;		// B
+			public static final byte LOOKUP_HAS_FREE_CRED = 5;		// B
+			public static final byte LOOKUP_HAS_FREE_OBJ = 6;		// B
+			public static final byte LOOKUP_AVAILABLE_OBJ_BY_HANDLE = 7;		// B
+			public static final byte LOOKUP_LIST_OBJ = 8;		// B
+			public static final byte LOOKUP_COUNT_OBJ_AOC = 9;		// B
+			public static final byte LOOKUP_COUNT_OBJ_GLOBCRED = 10;		// B
+			public static final byte LOOKUP_LIST_CRED = 11;		// B
+			public static final byte KEY_CLASS_SYMMETRIC = 1;		// B
+			public static final byte KEY_CLASS_ASYMMETRIC = 2;		// B
+			public static final byte KEY_TYPE_AES = 17;		// B
+			public static final byte KEY_TYPE_DES = 18;		// B
+			public static final byte KEY_TYPE_CHACHA = 19;		// B
+			public static final byte KEY_TYPE_RSA = 33;		// B
+			public static final byte KEY_TYPE_DH = 34;		// B
+			public static final byte KEY_TYPE_ECC_P256R1 = 35;		// B
+			public static final byte KEY_TYPE_ECC_P384R1 = 36;		// B
+			public static final byte KEY_TYPE_ECC_P521R1 = 37;		// B
+			public static final byte KEY_TYPE_ECC_P256K1 = 38;		// B
+			public static final byte KEY_TYPE_KMAC = 81;		// B
+			public static final byte CRED_AUTHTYPE_PIN = -128;		// B
+			public static final byte CRED_AUTHTYPE_PWD = 64;		// B
+			public static final byte CRED_AUTHTYPE_FP = 32;		// B
+			public static final byte CRED_AUTHTYPE_ASYMMKEY = 16;		// B
+			public static final byte CRED_AOC_ADMIN_RESET_FLAG = 1;		// B
+			public static final byte CRED_PERM_ADMIN_FLAG = 1;		// B
+			public static final byte CRED_FIELD_NAME = 1;		// B
+			public static final byte CRED_FIELD_IDPUBKEY = 2;		// B
+			public static final byte CRED_FIELD_SECRET = 3;		// B
+			public static final byte CRED_FIELD_EXPORT = 4;		// B
+			public static final byte CRED_FIELD_ACTIVE = 5;		// B
+			public static final byte CRED_FIELD_MANAGEMENT = 6;		// B
+			public static final byte CRED_FIELD_CREDID = 7;		// B
+			public static final byte CRED_FIELD_ADMIN = 8;		// B
+			public static final byte CRED_FIELD_SECRET_TYPE = 9;		// B
+			public static final byte CRED_FIELD_MAX_RETRIES = 10;		// B
+			public static final byte CRED_FIELD_RETAIN_ORPHAN = 11;		// B
+			public static final byte CRED_FIELD_CREATE = 12;		// B
+			public static final byte CRED_FIELD_EXPIRE = 13;		// B
+			public static final byte CRED_FIELD_ATTEST = 14;		// B
+			public static final byte CRED_FIELD_OID = 15;		// B
+			public static final byte CRED_FIELD_OBJCTR = 16;		// B
+			public static final byte CRED_STAT_INACTIVE = 0;		// B
+			public static final byte CRED_STAT_INIT = 1;		// B
+			public static final byte CRED_STAT_ACTIVE = 2;		// B
+			public static final byte AOCS_NONE = 0;		// B
+			public static final byte AOCS_LOGIN_BEGIN = 1;		// B
+			public static final byte AOCS_READY = 5;		// B
+			public static final byte ACT_AOC_MGMT = 1;		// B
+			public static final byte ACT_USR_MGMT = 2;		// B
+			public static final byte ACT_USR_FIND = 3;		// B
+			public static final byte ACT_USR_SIZE = 4;		// B
+			public static final byte ACT_USR_CREATE = 5;		// B
+			public static final byte ACT_USR_UPDATE = 6;		// B
+			public static final byte ACT_USR_DELETE = 7;		// B
+			public static final byte ACT_STE_AUTH = 1;		// B
+			public static final byte ACT_STE_CRYPT = 2;		// B
+			public static final byte ACT_STE_PROC = 3;		// B
+			public static final byte ACT_STATUS_BEGIN = 1;		// B
+			public static final byte ACT_STATUS_UPDATE = 2;		// B
+			public static final byte ACT_STATUS_FINAL = 3;		// B
+			public static final byte ACT_STATUS_CANCEL = 4;		// B
+			public static final byte ACT_STATUS_SUCCESS = 5;		// B
+			public static final byte ACT_STATUS_FAIL = 6;		// B
+			public static final byte CRYPT_LOAD = 1;		// B
+			public static final byte CRYPT_UPDATE = 2;		// B
+			public static final byte CRYPT_FINAL = 3;		// B
+			public static final byte CRYPT_RESET = 4;		// B
+			public static final byte CRYPT_KEYGEN = 5;		// B
+			public static final byte AUTH_INTERNAL = 2;		// B
+			public static final byte AUTH_MODE_USR_AUTH = 1;		// B
+			public static final byte AUTH_MODE_CONTAINER_AUTH = 2;		// B
+			public static final byte AUTH_MODE_STATE_AUTH = 3;		// B
+			public static final byte EXEC_COMPARE = 17;		// B
+			public static final byte EXEC_CRYPT_INTEGRITY_CREATION = 33;		// B
+			public static final byte EXEC_CRYPT_INTEGRITY_VERIFICATION = 34;		// B
+			public static final byte EXEC_CRYPT_CONTENT_PROTECT = 35;		// B
+			public static final byte EXEC_CRYPT_CONTENT_EXTRACT = 36;		// B
+			public static final byte ATTEST_LEVEL_ROOT_AUTH = 0;		// B
+			public static final byte ATTEST_LEVEL_INTERMEDIATE_AUTH = 1;		// B
+			public static final byte ATTEST_LEVEL_KM_AUTH = 2;		// B
+			public static final byte ATTEST_LEVEL_GLOBUSER_AUTH = 3;		// B
+			public static final byte ATTEST_LEVEL_AOC_AUTH = 4;		// B
+			public static final byte ATTEST_LEVEL_OBJECT = 5;		// B
+			public static final byte ACL_ALLOW_READ = 2;		// B
+			public static final byte ACL_ALLOW_EDIT = 1;		// B
+			public static final byte ACL_ALLOW_EXEC = 0;		// B
+			public static final byte NULL = 0;		// B
+			public static final byte WALLET_BALANCE_RECORD_SLOT = 0;		// B
+			public static final byte WALLET_PAYMENT_RECORD_SLOT = 16;		// B
+			public static final byte WALLET_LOADING_RECORD_SLOT = 32;		// B
+			public static final short SW_CARD_NOT_READY = 28447;		// S
+			public static final short SW_INVALID_USER_ROLE = 28577;		// S
+			public static final short SW_INVALID_USER_PIN = 28578;		// S
+			public static final short SW_INVALID_USER_ACCESS_RIGHTS = 28579;		// S
+			public static final short SW_NO_MORE_RETRIES = 25536;		// S
+			public static final short SW_UI_ERR = 28592;		// S
+		}
+
+		.method public abstract appLogin([BSS)S 0 {
+		}
+
+		.method public abstract createAOCContainer(B[BSSS)Z 1 {
+		}
+
+		.method public abstract destroyAOCContainer()Z 2 {
+		}
+
+		.method public abstract manageAOCContainer(B[BSSS[BS)Z 3 {
+		}
+
+		.method public abstract getAOCInfo([BS)S 4 {
+		}
+
+		.method public abstract getCardInfo([BS)S 5 {
+		}
+
+		.method public abstract displayToScreen([BSS[BS)V 6 {
+		}
+
+		.method public abstract setGlobalWalletAmount(B[BSS[BSS[BSS[BS)S 7 {
+		}
+
+		.method public abstract getGlobalWalletAmount(B[BS[BS)S 8 {
+		}
+
+	}
+
+}

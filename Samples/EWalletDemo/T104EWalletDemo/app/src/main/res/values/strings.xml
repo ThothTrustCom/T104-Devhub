@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">EWallet Demo</string>
+    <string name="VendingMachineMode">Vending Machine Mode</string>
+    <string name="MerchantTerminalMode">Merchant Terminal Mode</string>
+    <string name="TxViewMode">View Transaction Logs</string>
+    <string name="LblCardBalance">Card Balance</string>
+    <string name="LblCardPayment">Paid Funds</string>
+    <string name="LblCardLoaded">Loaded Funds</string>
+    <string name="LblUnknown">UNKNOWN</string>
+    <string name="LblExecute">Execute</string>
+    <string name="LblTxHistory">Transaction History</string>
+    <string name="LblPaymentAmt">Payment Amount</string>
+    <string name="LblExePaymentBeginBtn">Begin Payment</string>
+    <string name="LblLoadFundsAmt">Funds Amount: </string>
+    <string name="LblAction">Select Actions: </string>
+    <string name="NotifyTapToView">Power On card and tap card.</string>
+    <string name="NotifyCardReading">Card reading in progress. Hold card.</string>
+    <string name="NotifyCardRemove">Card reading OK. Remove card.</string>
+    <string name="NotifyPaymentValueInvalid">Please enter a valid numerical payment amount.</string>
+    <string name="NotifyPaymentValueRangeInvalid">Please enter a payment amount between 1 and 1000.</string>
+    <string name="NotifyPaymentSuccessful">Card payment SUCCESS. Remove card.</string>
+    <string name="NotifyPaymentFail">Card payment FAILED. Remove card.</string>
+    <string name="NotifyLoadFundsSuccessful">Loading of funds SUCCESS. Remove card.</string>
+    <string name="NotifyLoadFundsFail">Loading of funds FAILED. Remove card.</string>
+    <string name="NotifyResetFundsSuccessful">Resetting funds to 0/0/0 SUCCESS. Remove card.</string>
+    <string name="NotifyResetFundsFail">Resetting funds to 0/0/0 FAILED. Remove card.</string>
+</resources>
